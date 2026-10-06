@@ -1,0 +1,360 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Space Grotesk", "Noto Sans TC", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Source Code Pro", ui-monospace, monospace;
+  --color-brand: #0ea5e9;
+  --color-brand-dark: #0284c7;
+  --color-brand-soft: #e0f2fe;
+  --color-brand-tag: #bae6fd;
+  --color-stem: #14b8a6;
+  --color-stem-dark: #0f766e;
+  --color-lab: #0b1220;
+  --color-ink: #0f172a;
+  --color-muted: #475569;
+  --color-page: #f0f4f8;
+  --color-card: #ffffff;
+  --color-idle: #0b1220;
+  --color-idle-panel: #060b14;
+  --color-idle-bar: #121a2b;
+  --color-shell-green: #34d399;
+  --color-coral: #f43f5e;
+  --color-coral-dark: #e11d48;
+  --color-leaf: #0ea5e9;
+  --color-leaf-dark: #0284c7;
+  --color-cream: #f0f4f8;
+  --color-sand: #dbe3ec;
+  --color-code-bg: #0b1220;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes orbit {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes cat-move {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  30% {
+    transform: translateY(-8px) rotate(2deg);
+  }
+  60% {
+    transform: translateY(-4px) rotate(-1deg);
+  }
+}
+
+@keyframes cat-tail {
+  0%,
+  100% {
+    transform: rotate(-12deg);
+  }
+  50% {
+    transform: rotate(18deg);
+  }
+}
+
+@keyframes cat-blink {
+  0%,
+  88%,
+  100% {
+    transform: scaleY(1);
+  }
+  92%,
+  94% {
+    transform: scaleY(0.08);
+  }
+}
+
+.home-cat-bob {
+  transform-origin: 50% 90%;
+  animation: cat-move 2.6s ease-in-out infinite;
+}
+
+.home-cat-tail {
+  transform-origin: 138px 148px;
+  animation: cat-tail 1.6s ease-in-out infinite;
+}
+
+.home-cat-eyes {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cat-blink 4.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-cat-bob,
+  .home-cat-tail,
+  .home-cat-eyes {
+    animation: none;
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-display text-ink antialiased;
+    background-color: var(--color-page);
+  }
+}
+
+@layer components {
+  .blueprint-bg {
+    background-color: transparent;
+    background-image:
+      linear-gradient(rgba(14, 165, 233, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(14, 165, 233, 0.06) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .blueprint-grid {
+    background-image:
+      linear-gradient(rgba(14, 165, 233, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(14, 165, 233, 0.06) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .theme-is-midnight .blueprint-bg,
+  .theme-is-midnight .blueprint-grid {
+    background-image: none;
+  }
+
+  /* Light words on dark shop themes; keep dark words on pale cards/nav. */
+  .theme-is-midnight {
+    --color-ink: #f8fafc;
+    --color-muted: #cbd5e1;
+    --color-brand: #38bdf8;
+    --color-brand-dark: #7dd3fc;
+  }
+
+  .theme-surface-light,
+  .theme-is-midnight :is(
+    .bg-white,
+    .bg-white\/80,
+    .bg-white\/85,
+    .bg-white\/90,
+    .bg-white\/95,
+    .bg-slate-50,
+    .bg-slate-50\/90,
+    .bg-slate-100,
+    .bg-amber-50,
+    .bg-rose-50,
+    .bg-emerald-50,
+    .bg-cyan-50,
+    .bg-orange-50,
+    .bg-brand-soft,
+    .content-box,
+    .tip-box,
+    .practice-box
+  ) {
+    --color-ink: #0f172a;
+    --color-muted: #475569;
+    --color-brand: #0ea5e9;
+    --color-brand-dark: #0284c7;
+  }
+
+  .stem-chip {
+    @apply inline-flex items-center gap-1.5 rounded-md border border-brand/20 bg-brand-soft px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-wider text-brand-dark;
+  }
+
+  .lesson-prose h2 {
+    @apply mt-0 mb-3 text-xl font-bold text-ink;
+  }
+
+  .lesson-prose h3 {
+    @apply mt-6 mb-2 text-lg font-bold text-ink;
+  }
+
+  .lesson-prose p {
+    @apply mb-3 leading-relaxed text-muted;
+  }
+
+  .content-box {
+    @apply rounded-2xl border border-slate-200/80 bg-slate-50/90 p-5;
+  }
+
+  .pill-tag {
+    @apply inline-flex rounded-full bg-brand-tag px-3 py-1 text-sm font-semibold text-brand-dark;
+  }
+
+  .tip-box {
+    @apply my-5 overflow-hidden rounded-2xl border border-amber-200 bg-amber-50 pt-4;
+  }
+
+  .tip-box-label {
+    @apply px-4;
+  }
+
+  .tip-box-body {
+    @apply px-4;
+  }
+
+  /* Code windows inside tip/practice stay centered and sized like outer blocks */
+  .tip-box-body .code-window,
+  .practice-box-body .code-window {
+    @apply mx-auto mb-3 mt-2 w-full max-w-2xl rounded-lg shadow-inner ring-1 ring-black/20;
+  }
+
+  .practice-box {
+    @apply my-5 overflow-hidden rounded-2xl border border-cyan-200 bg-cyan-50 pt-4;
+  }
+
+  .practice-box-label {
+    @apply px-4;
+  }
+
+  .practice-box-body {
+    @apply px-4;
+  }
+
+  .card-soft {
+    @apply rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100;
+  }
+}
+
+.ide-rail {
+  position: fixed;
+  top: 3.5rem;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  width: min(420px, 38vw);
+  padding: 0.75rem;
+  display: none;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.lesson-with-ide {
+  min-height: calc(100vh - 3.5rem);
+}
+
+@media (min-width: 1024px) {
+  .ide-rail {
+    display: flex;
+  }
+
+  .lesson-with-ide {
+    padding-right: min(420px, 38vw);
+  }
+}
+
+/* Scratch needs a wide stage + blocks panel */
+.scratch-ide-rail {
+  position: fixed;
+  top: 3.5rem;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  width: min(780px, 58vw);
+  padding: 0.75rem;
+  display: none;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.scratch-ide-rail.is-expanded {
+  left: 0.75rem;
+  width: auto;
+  z-index: 35;
+}
+
+.lesson-with-scratch-ide {
+  min-height: calc(100vh - 3.5rem);
+}
+
+@media (min-width: 1024px) {
+  .scratch-ide-rail {
+    display: flex;
+  }
+
+  .lesson-with-scratch-ide {
+    padding-right: min(780px, 58vw);
+  }
+
+  .lesson-with-scratch-ide.is-ide-expanded {
+    padding-right: 0;
+  }
+}
+
+
+.python-ide-editor textarea {
+  outline: none !important;
+}
+
+.python-ide-editor .token.comment {
+  color: #6a9955;
+}
+
+.python-ide-editor .token.string {
+  color: #ce9178;
+}
+
+.python-ide-editor .token.number,
+.python-ide-editor .token.boolean {
+  color: #b5cea8;
+}
+
+.python-ide-editor .token.keyword {
+  color: #c586c0;
+}
+
+.python-ide-editor .token.function,
+.python-ide-editor .token.builtin {
+  color: #4fc1ff;
+}
+
+.python-ide-editor .token.operator,
+.python-ide-editor .token.punctuation {
+  color: #d4d4d4;
+}
+
+.python-ide-editor .token.class-name {
+  color: #4ec9b0;
+}
+
+.python-ide-editor pre,
+.python-ide-editor textarea {
+  font-family: "JetBrains Mono", "Source Code Pro", ui-monospace, monospace !important;
+  line-height: 1.65 !important;
+}

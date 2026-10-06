@@ -1,0 +1,12 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Serve the React app for every path so reload /math/compare etc. does not 404.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
