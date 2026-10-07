@@ -293,6 +293,9 @@ export default function ArithmeticQuiz() {
       {
         skillLevel: q?.skillLevel ?? 1,
         correct: Boolean(correct),
+        question: q?.prompt || "",
+        chosen: Array.isArray(inputs) ? inputs.filter(Boolean).join(", ") : String(inputs ?? ""),
+        expected: Array.isArray(q?.answer) ? q.answer.join(", ") : String(q?.answer ?? ""),
       },
     ];
     resultsRef.current = next;

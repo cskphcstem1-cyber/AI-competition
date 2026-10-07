@@ -65,9 +65,16 @@ export default function PythonChapterQuiz() {
     const nextScore = score + (correct ? 1 : 0);
     if (correct) setScore(nextScore);
     void awardTokens(correct);
+    const options = pickText(lang, current.options, current.optionsEn) || current.options || [];
     const nextAnswers = [
       ...answersRef.current,
-      { id: current.id, correct },
+      {
+        id: current.id,
+        correct,
+        question: pickText(lang, current.question, current.questionEn),
+        chosen: options[optionIndex] ?? "",
+        expected: options[current.answer] ?? "",
+      },
     ];
     answersRef.current = nextAnswers;
     setAnswers(nextAnswers);

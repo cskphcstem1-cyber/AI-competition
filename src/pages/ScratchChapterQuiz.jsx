@@ -57,9 +57,21 @@ export default function ScratchChapterQuiz() {
     const nextScore = score + (correct ? 1 : 0);
     if (correct) setScore(nextScore);
     void awardTokens(correct);
+    const qText =
+      lang === "en" && current.questionEn ? current.questionEn : current.question;
+    const opts =
+      (lang === "en" && current.optionsEn ? current.optionsEn : current.options) ||
+      current.options ||
+      [];
     const nextAnswers = [
       ...answersRef.current,
-      { id: current.id, correct },
+      {
+        id: current.id,
+        correct,
+        question: qText,
+        chosen: opts[optionIndex],
+        expected: opts[current.answer],
+      },
     ];
     answersRef.current = nextAnswers;
     setAnswers(nextAnswers);

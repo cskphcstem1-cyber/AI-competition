@@ -5,6 +5,11 @@ import {
 import { useLang } from "../contexts/LangContext";
 import { useAuth } from "../contexts/AuthContext";
 import { sendParentResultEmail } from "../lib/parentEmail";
+import {
+  analyzeQuizWithGemini,
+  wrongItemsFromAnswers,
+} from "../lib/geminiAnalyze";
+import { saveQuizAnalysis } from "../lib/practiceLog";
 
 function gradeFor(pct, tx) {
   if (pct >= 90) {
@@ -191,7 +196,11 @@ export default function PracticeReport({
   const [parentDraft, setParentDraft] = useState("");
   const [parentStatus, setParentStatus] = useState("");
   const [parentBusy, setParentBusy] = useState(false);
+  const [aiTip, setAiTip] = useState("");
+  const [aiStatus, setAiStatus] = useState("");
   const notifiedRef = useRef(false);
+  const analysisRef = useRef("");
+  const savedAnalysisRef = useRef(false);
 
   const safeTotal = Math.max(1, Number(total) || 0);
   const safeScore = Math.max(0, Number(score) || 0);
@@ -218,6 +227,59 @@ export default function PracticeReport({
   };
   const answerRows = Array.isArray(answers) ? answers : null;
 
+  const ensureAnalysis = async () => {
+    if (analysisRef.current) return analysisRef.current;
+    setAiStatus("loading");
+    const studentName = user?.displayName || user?.email?.split("@")[0] || "";
+    const tip = await analyzeQuizWithGemini({
+      lang,
+      studentName,
+      title,
+      subtitle,
+      score: safeScore,
+      total: safeTotal,
+      pct,
+      wrongItems: wrongItemsFromAnswers(answerRows || []),
+      answers: answerRows || [],
+    });
+    if (tip) {
+      analysisRef.current = tip;
+      setAiTip(tip);
+      setAiStatus("ready");
+      if (user?.uid && !savedAnalysisRef.current) {
+        savedAnalysisRef.current = true;
+        saveQuizAnalysis(user.uid, {
+          title,
+          subtitle,
+          subject,
+          score: safeScore,
+          total: safeTotal,
+          pct,
+          analysis: tip,
+          at: Date.now(),
+        }).catch((err) => {
+          savedAnalysisRef.current = false;
+          console.warn("save quiz analysis failed", err);
+        });
+      }
+      return tip;
+    }
+    setAiStatus("error");
+    return "";
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const tip = await ensureAnalysis();
+      if (cancelled || !tip) return;
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [title, subtitle, safeScore, safeTotal, pct, lang, answerRows?.length]);
+
   useEffect(() => {
     if (!user || !parentEmail || notifiedRef.current) return;
     const key = `ck-parent-mail:${user.uid}:${title}:${safeScore}/${safeTotal}`;
@@ -231,28 +293,32 @@ export default function PracticeReport({
     }
     notifiedRef.current = true;
     setParentStatus("sending");
-    sendParentResultEmail({
-      to: parentEmail,
-      lang,
-      studentName: user.displayName || user.email?.split("@")[0],
-      title,
-      subtitle,
-      score: safeScore,
-      total: safeTotal,
-      pct,
-    })
-      .then(() => {
+    (async () => {
+      try {
+        const analysis = await ensureAnalysis();
+        await sendParentResultEmail({
+          to: parentEmail,
+          lang,
+          studentName: user.displayName || user.email?.split("@")[0],
+          title,
+          subtitle,
+          score: safeScore,
+          total: safeTotal,
+          pct,
+          analysis,
+        });
         try {
           sessionStorage.setItem(key, "1");
         } catch {
           /* ignore */
         }
         setParentStatus("sent");
-      })
-      .catch(() => {
+      } catch {
         notifiedRef.current = false;
         setParentStatus("error");
-      });
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, parentEmail, title, subtitle, safeScore, safeTotal, pct, lang]);
 
   const saveParentAndSend = async (event) => {
@@ -262,6 +328,7 @@ export default function PracticeReport({
     setParentStatus("");
     try {
       const savedEmail = await saveParentEmail(parentDraft);
+      const analysis = await ensureAnalysis();
       await sendParentResultEmail({
         to: savedEmail,
         lang,
@@ -271,6 +338,7 @@ export default function PracticeReport({
         score: safeScore,
         total: safeTotal,
         pct,
+        analysis,
       });
       setParentStatus("sent");
     } catch {
@@ -412,6 +480,30 @@ export default function PracticeReport({
             </span>
           </div>
           <p className="mt-1 text-sm">{grade.message}</p>
+        </div>
+
+        <div className="mb-5 rounded-xl border border-violet-200 bg-violet-50 px-4 py-3 text-violet-950">
+          <p className="text-sm font-bold">
+            {tx("AI 學習建議（Gemini）", "AI study tips (Gemini)")}
+          </p>
+          {aiStatus === "loading" && (
+            <p className="mt-1 text-sm text-violet-800/80">
+              {tx("正在分析答錯的題目…", "Analyzing the missed questions…")}
+            </p>
+          )}
+          {aiTip ? (
+            <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed">
+              {aiTip}
+            </p>
+          ) : null}
+          {aiStatus === "error" && !aiTip ? (
+            <p className="mt-1 text-sm text-violet-800/80">
+              {tx(
+                "暫時無法取得 AI 建議。請確認已設定 Gemini API key（本機 .env.local 或 Netlify 環境變數）。",
+                "AI tips are unavailable right now. Set a Gemini API key in .env.local or Netlify env vars.",
+              )}
+            </p>
+          ) : null}
         </div>
 
         {extra ? <div className="mb-5">{extra}</div> : null}

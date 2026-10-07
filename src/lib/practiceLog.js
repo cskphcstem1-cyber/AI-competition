@@ -76,12 +76,100 @@ export async function setChapterComplete(uid, progressField, complete, practice)
   });
 }
 
+/** @returns {Promise<{ practiceLog: Record<string, Array<Record<string, unknown>>>, quizAnalyses: Array<Record<string, unknown>> }>} */
+export async function fetchStudentReports(uid) {
+  if (!uid) return { practiceLog: {}, quizAnalyses: [] };
+  const snap = await getDoc(doc(db, "users", uid));
+  if (!snap.exists()) return { practiceLog: {}, quizAnalyses: [] };
+  const data = snap.data();
+  return {
+    practiceLog: data.practiceLog || {},
+    quizAnalyses: Array.isArray(data.quizAnalyses) ? data.quizAnalyses : [],
+  };
+}
+
+/** Save one Gemini quiz analysis on the student account. */
+export async function saveQuizAnalysis(uid, entry) {
+  if (!uid || !entry?.title) return;
+  const text = String(entry.analysis || "").trim().slice(0, 4000);
+  if (!text) return;
+  await updateDoc(doc(db, "users", uid), {
+    quizAnalyses: arrayUnion({
+      title: String(entry.title).slice(0, 160),
+      subtitle: String(entry.subtitle || "").slice(0, 160),
+      subject: entry.subject || "other",
+      score: Number(entry.score) || 0,
+      total: Number(entry.total) || 0,
+      pct: Number(entry.pct) || 0,
+      analysis: text,
+      at: Number(entry.at) || Date.now(),
+    }),
+  });
+}
+
+function monthPrefix(date = new Date()) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  return `${y}-${m}`;
+}
+
+function inMonth(at, prefix) {
+  if (!at) return false;
+  const d = new Date(Number(at));
+  if (Number.isNaN(d.getTime())) return false;
+  return dateKey(d).startsWith(prefix);
+}
+
+/**
+ * Tests finished this calendar month.
+ * Saved Gemini notes are preferred; practice-log scores fill gaps.
+ */
+export function testsThisMonth(practiceLog, quizAnalyses, now = new Date()) {
+  const prefix = monthPrefix(now);
+  const fromAnalyses = (quizAnalyses || [])
+    .filter((item) => inMonth(item.at, prefix))
+    .map((item) => ({
+      date: dateKey(new Date(item.at)),
+      title: item.title || "",
+      subtitle: item.subtitle || "",
+      score: item.score ?? null,
+      total: item.total ?? null,
+      analysis: item.analysis || "",
+    }));
+
+  const seen = new Set(
+    fromAnalyses.map((item) => `${item.date}|${item.title}|${item.score}/${item.total}`),
+  );
+
+  const fromLog = [];
+  for (const [day, entries] of Object.entries(practiceLog || {})) {
+    if (!String(day).startsWith(prefix) || !Array.isArray(entries)) continue;
+    for (const entry of entries) {
+      if (entry?.score == null || entry?.total == null) continue;
+      const title = entry.label || entry.detail || "Practice";
+      const key = `${day}|${title}|${entry.score}/${entry.total}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      fromLog.push({
+        date: day,
+        title,
+        subtitle: entry.detail || "",
+        score: entry.score,
+        total: entry.total,
+        analysis: "",
+      });
+    }
+  }
+
+  return [...fromAnalyses, ...fromLog].sort((a, b) =>
+    String(a.date).localeCompare(String(b.date)),
+  );
+}
+
 /** @returns {Promise<Record<string, Array<Record<string, unknown>>>>} */
 export async function fetchPracticeLog(uid) {
-  if (!uid) return {};
-  const snap = await getDoc(doc(db, "users", uid));
-  if (!snap.exists()) return {};
-  return snap.data().practiceLog || {};
+  const { practiceLog } = await fetchStudentReports(uid);
+  return practiceLog;
 }
 
 export const SUBJECT_META = {

@@ -80,9 +80,9 @@ export default function MathSkillQuiz() {
   useEffect(() => {
     if (!quiz || finished || locked || timeLeft > 0) return;
     if (current?.kind === "fill") {
-      lockAndAdvance(isSkillAnswerCorrect(typed, current.answer));
+      lockAndAdvance(isSkillAnswerCorrect(typed, current.answer), typed || "(timed out)");
     } else {
-      lockAndAdvance(false);
+      lockAndAdvance(false, "(timed out)");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeLeft, finished, locked, quiz]);
@@ -135,22 +135,38 @@ export default function MathSkillQuiz() {
     setTimeLeft(TIME_LIMIT);
   };
 
-  const record = (correct) => {
+  const record = (correct, chosenText) => {
     const nextScore = scoreRef.current + (correct ? 1 : 0);
     if (correct) setScore(nextScore);
     scoreRef.current = nextScore;
     void awardTokens(correct);
-    const nextAnswers = [...answersRef.current, { id: current.id, correct }];
+    const prompt = lang === "en" ? current.promptEn || current.prompt : current.prompt;
+    const options =
+      (lang === "en" && current.optionsEn) || current.options || [];
+    const expected =
+      current.kind === "choice"
+        ? options[current.answer] ?? String(current.answer ?? "")
+        : String(current.answer ?? "");
+    const nextAnswers = [
+      ...answersRef.current,
+      {
+        id: current.id,
+        correct,
+        question: prompt,
+        chosen: chosenText || "",
+        expected,
+      },
+    ];
     answersRef.current = nextAnswers;
     setAnswers(nextAnswers);
     return { nextScore, nextAnswers };
   };
 
-  const lockAndAdvance = (correct) => {
+  const lockAndAdvance = (correct, chosenText) => {
     if (lockedRef.current || finished || !current) return;
     lockedRef.current = true;
     setLocked(true);
-    const { nextScore, nextAnswers } = record(correct);
+    const { nextScore, nextAnswers } = record(correct, chosenText);
     if (timerRef.current != null) window.clearTimeout(timerRef.current);
     timerRef.current = window.setTimeout(() => {
       goNext(nextScore, nextAnswers);
@@ -159,14 +175,16 @@ export default function MathSkillQuiz() {
 
   const choose = (optionIndex) => {
     if (current?.kind !== "choice") return;
-    lockAndAdvance(optionIndex === current.answer);
+    const options =
+      (lang === "en" && current.optionsEn) || current.options || [];
+    lockAndAdvance(optionIndex === current.answer, options[optionIndex] ?? "");
     setSelected(optionIndex);
   };
 
   const submitFill = (event) => {
     event.preventDefault();
     if (current?.kind !== "fill" || lockedRef.current) return;
-    lockAndAdvance(isSkillAnswerCorrect(typed, current.answer));
+    lockAndAdvance(isSkillAnswerCorrect(typed, current.answer), typed);
   };
 
   const restart = () => {

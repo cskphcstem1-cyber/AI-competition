@@ -5,10 +5,13 @@ import { useShop } from "../contexts/ShopContext";
 import { useLang } from "../contexts/LangContext";
 import { isDarkBackground } from "../data/shopItems";
 import PracticeCalendar, { CalendarIcon } from "../components/PracticeCalendar";
+import { analyzeMonthWithGemini } from "../lib/geminiAnalyze";
+import { sendParentMonthlyEmail } from "../lib/parentEmail";
+import { fetchStudentReports, testsThisMonth } from "../lib/practiceLog";
 
 export default function Home() {
-  const { user, isAdmin } = useAuth();
-  const { t } = useLang();
+  const { user, isAdmin, parentEmail } = useAuth();
+  const { lang, t } = useLang();
   const {
     equipped,
     tokens,
@@ -17,6 +20,51 @@ export default function Home() {
     setShowDaily,
   } = useShop();
   const [showCalendar, setShowCalendar] = useState(false);
+  const [monthStatus, setMonthStatus] = useState("");
+
+  const sendMonthReport = async () => {
+    if (!user || monthStatus === "sending") return;
+    if (!parentEmail) {
+      setMonthStatus("need-email");
+      return;
+    }
+    setMonthStatus("sending");
+    try {
+      const { practiceLog, quizAnalyses } = await fetchStudentReports(user.uid);
+      const tests = testsThisMonth(practiceLog, quizAnalyses);
+      if (tests.length === 0) {
+        setMonthStatus("empty");
+        return;
+      }
+      const now = new Date();
+      const month =
+        lang === "en"
+          ? now.toLocaleString("en-US", { month: "long", year: "numeric" })
+          : `${now.getFullYear()} 年 ${now.getMonth() + 1} 月`;
+      const studentName = user.displayName || user.email?.split("@")[0] || "";
+      const analysis = await analyzeMonthWithGemini({
+        lang,
+        studentName,
+        month,
+        tests,
+      });
+      if (!analysis) {
+        setMonthStatus("error");
+        return;
+      }
+      await sendParentMonthlyEmail({
+        to: parentEmail,
+        lang,
+        studentName,
+        month,
+        testCount: tests.length,
+        analysis,
+      });
+      setMonthStatus("sent");
+    } catch {
+      setMonthStatus("error");
+    }
+  };
   const isMidnight = isDarkBackground(equipped.background);
   const ink = isMidnight ? "text-white" : "text-ink";
   const muted = isMidnight ? "text-slate-300" : "text-muted";
@@ -69,7 +117,34 @@ export default function Home() {
             <CalendarIcon className="h-5 w-5" />
             <span className="hidden sm:inline">{t.home.calendar}</span>
           </button>
+          {!isAdmin && (
+            <button
+              type="button"
+              onClick={sendMonthReport}
+              disabled={monthStatus === "sending"}
+              className="inline-flex max-w-[14rem] items-center rounded-full border border-violet-300 bg-white/90 px-4 py-2 text-left text-sm font-semibold text-violet-900 shadow-sm backdrop-blur transition hover:border-violet-500 disabled:opacity-60 sm:max-w-none sm:text-base"
+              title={t.home.monthReport}
+            >
+              {monthStatus === "sending" ? t.home.monthSending : t.home.monthReport}
+            </button>
+          )}
         </div>
+      )}
+      {user && !isAdmin && monthStatus && monthStatus !== "sending" && (
+        <p
+          className={`absolute top-16 left-3 z-20 max-w-xs rounded-2xl border px-3 py-2 text-sm font-semibold shadow-sm backdrop-blur sm:top-[4.5rem] sm:left-4 ${
+            monthStatus === "sent"
+              ? "border-emerald-200 bg-emerald-50/95 text-emerald-800"
+              : monthStatus === "error"
+                ? "border-rose-200 bg-rose-50/95 text-rose-700"
+                : "border-amber-200 bg-amber-50/95 text-amber-900"
+          }`}
+        >
+          {monthStatus === "sent" && t.home.monthSent(parentEmail)}
+          {monthStatus === "empty" && t.home.monthEmpty}
+          {monthStatus === "need-email" && t.home.monthNeedEmail}
+          {monthStatus === "error" && t.home.monthError}
+        </p>
       )}
 
       {/* Shop — top-right of pink area */}
