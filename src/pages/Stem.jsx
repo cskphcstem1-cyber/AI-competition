@@ -46,12 +46,12 @@ export default function Stem() {
   const muted = isMidnight ? "text-slate-300" : "text-muted";
 
   return (
-    <main className="relative flex h-[calc(100vh-3.5rem)] w-full flex-col items-center justify-center overflow-hidden px-5 sm:px-8">
-      <div className="grid w-full max-w-7xl gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <main className="relative min-h-[calc(100dvh-3rem)] w-full overflow-y-auto px-4 py-5 sm:flex sm:h-[calc(100dvh-3.5rem)] sm:min-h-0 sm:flex-col sm:items-center sm:justify-center sm:overflow-hidden sm:px-8 sm:py-6">
+      <div className="grid w-full max-w-7xl gap-4 pb-28 sm:grid-cols-2 sm:gap-6 sm:pb-0 lg:grid-cols-4">
         {STEM.map((item) => (
           <div
             key={item.letter}
-            className={`flex flex-col rounded-2xl border p-7 text-left shadow-sm backdrop-blur ${
+            className={`flex flex-col rounded-2xl border p-5 text-left shadow-sm backdrop-blur sm:p-7 ${
               isMidnight
                 ? "border-white/15 bg-white/10"
                 : "border-white/80 bg-white/90"
@@ -67,7 +67,7 @@ export default function Stem() {
             >
               {item.title}
             </p>
-            <h3 className={`mb-2 text-3xl font-bold ${ink}`}>
+            <h3 className={`mb-2 text-2xl font-bold sm:text-3xl ${ink}`}>
               {t.stem[item.key].zh}
             </h3>
             {t.stem[item.key].desc ? (
@@ -93,13 +93,13 @@ export default function Stem() {
 
       <Link
         to="/"
-        className="fixed right-5 bottom-5 z-50 flex h-20 w-20 items-center justify-center rounded-full border border-slate-200 bg-white text-ink shadow-lg transition hover:border-brand hover:text-brand-dark hover:shadow-xl sm:right-6 sm:bottom-6"
+        className="fixed bottom-4 left-3 z-40 flex h-14 w-14 items-center justify-center rounded-full border border-slate-200 bg-white text-ink shadow-lg transition hover:border-brand hover:text-brand-dark hover:shadow-xl sm:bottom-6 sm:left-6 sm:h-16 sm:w-16"
         title="Home"
         aria-label={t.stem.homeAria}
       >
         <svg
           viewBox="0 0 24 24"
-          className="h-10 w-10"
+          className="h-7 w-7 sm:h-8 sm:w-8"
           fill="currentColor"
           aria-hidden="true"
         >

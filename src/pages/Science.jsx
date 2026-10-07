@@ -93,7 +93,7 @@ export default function Science() {
               </div>
               <Link
                 to={item.to}
-                className="group inline-flex w-56 shrink-0 items-center justify-center gap-2 rounded-xl bg-lab px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-ink"
+                className="group inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-lab px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-ink sm:w-56"
               >
                 <span className="font-mono text-shell-green">{item.badge}</span>
                 {t.science.start}

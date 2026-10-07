@@ -545,7 +545,7 @@ export default function RainbowLightExperiment() {
         </div>
 
         {/* Control panel */}
-        <aside className="w-full shrink-0 border-t border-slate-400/30 bg-[#f0f4f7] lg:w-72 lg:border-l lg:border-t-0">
+        <aside className="w-full shrink-0 border-t border-slate-400/30 bg-[#f0f4f7] pb-28 lg:w-72 lg:border-l lg:border-t-0 lg:pb-0">
           <div className="border-b border-slate-300 bg-[#dfe6ec] px-3 py-2 text-xs font-black uppercase tracking-wider text-slate-700">
             {tx("控制面板", "Controls")}
           </div>

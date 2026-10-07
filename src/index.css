@@ -358,3 +358,24 @@
   font-family: "JetBrains Mono", "Source Code Pro", ui-monospace, monospace !important;
   line-height: 1.65 !important;
 }
+
+html {
+  overflow-x: clip;
+}
+
+@media (max-width: 639px) {
+  .blueprint-bg > .mx-auto,
+  .lesson-with-ide > .mx-auto,
+  .lesson-with-scratch-ide > .mx-auto,
+  .min-h-\[calc\(100vh-3\.5rem\)\] > .mx-auto {
+    padding-bottom: 7.5rem;
+  }
+
+  .code-window {
+    max-width: 100%;
+  }
+
+  .code-window pre {
+    overflow-x: auto !important;
+  }
+}

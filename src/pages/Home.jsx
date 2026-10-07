@@ -85,10 +85,10 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="relative h-[calc(100vh-3.5rem)] overflow-hidden">
+    <main className="relative h-[calc(100dvh-3rem)] overflow-x-hidden overflow-y-auto sm:h-[calc(100dvh-3.5rem)] sm:overflow-hidden">
       {/* Data buttons — top-left of pink area */}
       {user && (
-        <div className="absolute top-3 left-3 z-20 flex items-center gap-2 sm:top-4 sm:left-4">
+        <div className="absolute top-3 left-3 right-16 z-20 flex flex-wrap items-center gap-2 sm:right-auto sm:top-4 sm:left-4">
           {!isAdmin && (
           <button
             type="button"
@@ -122,10 +122,15 @@ export default function Home() {
               type="button"
               onClick={sendMonthReport}
               disabled={monthStatus === "sending"}
-              className="inline-flex max-w-[14rem] items-center rounded-full border border-violet-300 bg-white/90 px-4 py-2 text-left text-sm font-semibold text-violet-900 shadow-sm backdrop-blur transition hover:border-violet-500 disabled:opacity-60 sm:max-w-none sm:text-base"
+              className="inline-flex max-w-full items-center rounded-full border border-violet-300 bg-white/90 px-3 py-2 text-left text-sm font-semibold text-violet-900 shadow-sm backdrop-blur transition hover:border-violet-500 disabled:opacity-60 sm:px-4 sm:text-base"
               title={t.home.monthReport}
             >
-              {monthStatus === "sending" ? t.home.monthSending : t.home.monthReport}
+              <span className="sm:hidden">
+                {monthStatus === "sending" ? t.home.monthSending : t.home.monthShort}
+              </span>
+              <span className="hidden sm:inline">
+                {monthStatus === "sending" ? t.home.monthSending : t.home.monthReport}
+              </span>
             </button>
           )}
         </div>
@@ -162,12 +167,12 @@ export default function Home() {
         ) : null}
       </Link>
 
-      <section className="relative mx-auto flex h-full max-w-6xl flex-col items-center justify-center px-4 py-8 text-center">
-        <div className="relative mb-8 animate-[fadeUp_0.6s_ease]">
+      <section className="relative mx-auto flex min-h-full max-w-6xl flex-col items-center justify-center px-4 py-20 text-center sm:py-8">
+        <div className="relative mb-5 animate-[fadeUp_0.6s_ease] sm:mb-8">
           <img
             src="/logo.png"
             alt="CSK PHC · Jucunditas Ac Servitium"
-            className="mx-auto h-36 w-36 object-contain drop-shadow-xl sm:h-44 sm:w-44"
+            className="mx-auto h-24 w-24 object-contain drop-shadow-xl sm:h-44 sm:w-44"
           />
           <div
             className="pointer-events-none absolute -inset-5 animate-[orbit_18s_linear_infinite] rounded-full border border-dashed border-brand/30"
@@ -176,7 +181,7 @@ export default function Home() {
         </div>
 
         <p
-          className={`mb-3 font-mono text-base font-bold uppercase tracking-[0.22em] ${brandDark} ${
+          className={`mb-3 font-mono text-xs font-bold uppercase tracking-[0.14em] sm:text-base sm:tracking-[0.22em] ${brandDark} ${
             equipped.background === "bg-sakura"
               ? "drop-shadow-[0_1px_8px_rgba(255,255,255,0.95)]"
               : ""
@@ -185,7 +190,7 @@ export default function Home() {
           Science · Technology · Engineering · Mathematics
         </p>
         <h1
-          className={`mb-4 text-6xl font-bold leading-tight tracking-tight sm:text-7xl md:text-8xl ${ink} ${
+          className={`mb-4 text-5xl font-bold leading-tight tracking-tight sm:text-7xl md:text-8xl ${ink} ${
             equipped.background === "bg-sakura"
               ? "drop-shadow-[0_2px_12px_rgba(255,255,255,0.95)]"
               : ""
@@ -193,7 +198,7 @@ export default function Home() {
         >
           Code<span className={brand}>Kids</span>
           <span
-            className={`mt-2 block text-3xl font-semibold sm:text-4xl ${muted}`}
+            className={`mt-2 block text-2xl font-semibold sm:text-4xl ${muted}`}
           >
             {t.home.tagline}
           </span>
@@ -201,7 +206,7 @@ export default function Home() {
         <div className="mt-8 flex flex-wrap justify-center animate-[fadeUp_0.85s_ease]">
           <Link
             to="/stem"
-            className={`rounded-xl border px-12 py-5 text-xl font-bold backdrop-blur transition hover:border-brand ${
+            className={`rounded-xl border px-8 py-4 text-lg font-bold backdrop-blur transition hover:border-brand sm:px-12 sm:py-5 sm:text-xl ${
               isMidnight
                 ? "border-white/20 bg-white/10 text-white hover:text-sky-200"
                 : "border-slate-300 bg-white/80 text-ink hover:text-brand-dark"

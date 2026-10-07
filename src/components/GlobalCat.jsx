@@ -8,7 +8,7 @@ import HomeCat from "./HomeCat";
 const CAT_HIDDEN_KEY = "codekids-cat-hidden";
 
 function chipClass(isMidnight) {
-  return `rounded-2xl border px-3 py-1.5 text-sm font-bold shadow-sm backdrop-blur transition ${
+  return `rounded-2xl border px-2.5 py-1 text-xs font-bold shadow-sm backdrop-blur transition sm:px-3 sm:py-1.5 sm:text-sm ${
     isMidnight
       ? "border-white/20 bg-white/15 text-white hover:bg-white/25"
       : "border-slate-200 bg-white/90 text-ink hover:border-brand hover:text-brand-dark"
@@ -43,28 +43,31 @@ export default function GlobalCat() {
         className={`pointer-events-auto fixed bottom-2 right-2 z-30 sm:bottom-4 sm:right-5 ${chipClass(isMidnight)}`}
         title={t.home.showCat}
       >
-        {t.home.showCat}
+        <span className="sm:hidden">{t.home.showCatShort}</span>
+        <span className="hidden sm:inline">{t.home.showCat}</span>
       </button>
     );
   }
 
   return (
-    <div className="pointer-events-auto fixed bottom-2 right-2 z-30 flex flex-col items-end gap-1 sm:bottom-4 sm:right-5">
-      <div className="flex flex-wrap items-center justify-end gap-1.5">
+    <div className="pointer-events-auto fixed bottom-2 right-2 z-30 flex w-28 flex-col items-stretch gap-1 sm:bottom-4 sm:right-5 sm:w-auto sm:items-end">
+      <div className="flex flex-col items-stretch gap-1 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
         <button
           type="button"
           onClick={() => setHidden(true)}
           className={chipClass(isMidnight)}
           title={t.home.hideCat}
         >
-          {t.home.hideCat}
+          <span className="sm:hidden">{t.home.hideCatShort}</span>
+          <span className="hidden sm:inline">{t.home.hideCat}</span>
         </button>
         <Link
           to="/shop?tab=cat"
-          className={`group ${chipClass(isMidnight)}`}
+          className={`group text-center ${chipClass(isMidnight)}`}
           title={t.home.catShop}
         >
-          {t.home.catShop}
+          <span className="sm:hidden">{t.home.catShopShort}</span>
+          <span className="hidden sm:inline">{t.home.catShop}</span>
         </Link>
       </div>
       <Link to="/shop?tab=cat" title={t.home.catShop}>

@@ -17,7 +17,6 @@ const TOPICS = [
     mark: "<",
     key: "compare",
     to: "/math/compare",
-    practiceTo: "/math/compare/quiz",
     badge: "check",
     accent: "from-violet-600 to-fuchsia-400",
   },
@@ -27,7 +26,6 @@ const TOPICS = [
     mark: "B",
     key: "binary",
     to: "/math/binary",
-    practiceTo: "/math/binary/quiz",
     badge: "bits",
     accent: "from-sky-600 to-cyan-400",
   },
@@ -37,7 +35,6 @@ const TOPICS = [
     mark: "H",
     key: "hex",
     to: "/math/hex",
-    practiceTo: "/math/hex/quiz",
     badge: "hex",
     accent: "from-emerald-600 to-teal-400",
   },
@@ -99,14 +96,6 @@ export default function Math() {
                   {t.math.start}
                   <span className="transition group-hover:translate-x-0.5">→</span>
                 </Link>
-                {topic.practiceTo ? (
-                  <Link
-                    to={topic.practiceTo}
-                    className="inline-flex w-fit items-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-bold text-amber-800 shadow-sm transition hover:border-amber-400"
-                  >
-                    T {t.math.practice}
-                  </Link>
-                ) : null}
               </div>
             </article>
           ))}

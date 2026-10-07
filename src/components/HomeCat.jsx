@@ -8,7 +8,12 @@ export default function HomeCat({
   const eyes = decorations.find((id) => id.startsWith("cat-eyes-"));
   const neck = decorations.find((id) => id.startsWith("cat-neck-"));
   const held = decorations.find((id) => id.startsWith("cat-held-"));
-  const dim = size === "sm" ? "h-24 w-24" : size === "md" ? "h-36 w-36" : "h-44 w-44 sm:h-52 sm:w-52";
+  const dim =
+    size === "sm"
+      ? "h-24 w-24"
+      : size === "md"
+        ? "h-28 w-28 sm:h-36 sm:w-36"
+        : "h-28 w-28 sm:h-44 sm:w-44 md:h-52 md:w-52";
 
   return (
     <div className={`relative ${dim} ${className}`} aria-hidden="true">

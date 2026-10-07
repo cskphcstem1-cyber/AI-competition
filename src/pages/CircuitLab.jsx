@@ -724,7 +724,7 @@ export default function CircuitLab() {
   }, [wires, comps, analysis, showElectrons]);
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)] flex-col bg-[#b6dff0]">
+    <div className="flex min-h-[calc(100dvh-3rem)] flex-col bg-[#b6dff0] pb-28 sm:h-[calc(100dvh-3.5rem)] sm:min-h-0 sm:pb-0">
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 bg-white/90 px-4 py-3 backdrop-blur">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">
