@@ -11,7 +11,10 @@ service cloud.firestore {
 
     function isAdmin() {
       return isSignedIn()
-        && request.auth.token.email == 'st1556192@cskphc.edu.mo';
+        && request.auth.token.email in [
+          'st1556192@cskphc.edu.mo',
+          'st1555410@cskphc.edu.mo'
+        ];
     }
 
     match /users/{userId} {

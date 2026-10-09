@@ -24,7 +24,7 @@ npm run dev
 3. **Firestore Database** → 建立資料庫
 4. 若本機測試出現 unauthorized domain，在 Authentication → Settings → Authorized domains 加入 `localhost`
 
-管理員帳戶：`st1556192@cskphc.edu.mo`（用此電郵登入後，右上角會出現「管理」）。
+管理員帳戶：`st1556192@cskphc.edu.mo`、`st1555410@cskphc.edu.mo`（用這些電郵登入後，右上角會出現「管理」）。
 
 建議 Firestore 規則（見 `firestore.rules`）：
 
@@ -40,7 +40,10 @@ service cloud.firestore {
     }
     function isAdmin() {
       return isSignedIn()
-        && request.auth.token.email == 'st1556192@cskphc.edu.mo';
+        && request.auth.token.email in [
+          'st1556192@cskphc.edu.mo',
+          'st1555410@cskphc.edu.mo'
+        ];
     }
     match /users/{userId} {
       allow read: if isOwner(userId) || isAdmin();

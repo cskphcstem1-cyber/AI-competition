@@ -1,4 +1,7 @@
-export const ADMIN_EMAILS = ["st1556192@cskphc.edu.mo"];
+export const ADMIN_EMAILS = [
+  "st1556192@cskphc.edu.mo",
+  "st1555410@cskphc.edu.mo",
+];
 
 export function isAdminEmail(email) {
   if (!email) return false;
