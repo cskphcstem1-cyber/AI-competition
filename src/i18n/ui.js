@@ -14,7 +14,7 @@ export const UI = {
       closeMenu: "關閉選單",
     },
     home: {
-      tagline: "小學 STEM 編程實驗室",
+      tagline: "STEM 編程實驗室",
       start: "開始",
       shop: "商店",
       calendar: "日曆",
