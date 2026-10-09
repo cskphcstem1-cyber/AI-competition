@@ -198,6 +198,7 @@ export default function PracticeReport({
   const [parentBusy, setParentBusy] = useState(false);
   const [aiTip, setAiTip] = useState("");
   const [aiStatus, setAiStatus] = useState("");
+  const [openIndex, setOpenIndex] = useState(null);
   const notifiedRef = useRef(false);
   const analysisRef = useRef("");
   const savedAnalysisRef = useRef(false);
@@ -512,18 +513,62 @@ export default function PracticeReport({
           <div className="mb-4">
             <p className="mb-2 text-sm font-bold text-ink">{copy.perQuestion}</p>
             <div className="flex flex-wrap gap-1.5">
-              {answerRows.map((row, i) => (
-                <span
-                  key={row.id ?? i}
-                  title={tx(`第 ${i + 1} 題`, `Question ${i + 1}`)}
-                  className={`inline-flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold text-white ${
-                    row.correct ? "bg-emerald-500" : "bg-rose-400"
-                  }`}
-                >
-                  {i + 1}
-                </span>
-              ))}
+              {answerRows.map((row, i) => {
+                const open = openIndex === i;
+                return (
+                  <button
+                    key={row.id ?? i}
+                    type="button"
+                    aria-pressed={open}
+                    title={tx(`第 ${i + 1} 題`, `Question ${i + 1}`)}
+                    onClick={() => setOpenIndex(open ? null : i)}
+                    className={`inline-flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold text-white transition ${
+                      row.correct ? "bg-emerald-500" : "bg-rose-400"
+                    } ${open ? "ring-2 ring-ink ring-offset-2" : "hover:brightness-95"}`}
+                  >
+                    {i + 1}
+                  </button>
+                );
+              })}
             </div>
+            {openIndex != null && answerRows[openIndex] ? (
+              <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+                <p className="flex flex-wrap items-center gap-2 font-bold text-ink">
+                  <span>
+                    {tx(`第 ${openIndex + 1} 題`, `Question ${openIndex + 1}`)}
+                  </span>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs ${
+                      answerRows[openIndex].correct
+                        ? "bg-emerald-100 text-emerald-700"
+                        : "bg-rose-100 text-rose-700"
+                    }`}
+                  >
+                    {answerRows[openIndex].correct
+                      ? tx("答對", "Correct")
+                      : tx("答錯", "Wrong")}
+                  </span>
+                </p>
+                <p className="mt-2 text-xs font-bold uppercase tracking-wide text-muted">
+                  {tx("題目", "Question")}
+                </p>
+                <p className="mt-0.5 whitespace-pre-wrap font-semibold text-ink">
+                  {answerRows[openIndex].question || "—"}
+                </p>
+                <p className="mt-2 text-xs font-bold uppercase tracking-wide text-muted">
+                  {tx("你的答案", "Your answer")}
+                </p>
+                <p className="mt-0.5 whitespace-pre-wrap text-ink">
+                  {answerRows[openIndex].chosen || tx("未作答", "No answer")}
+                </p>
+                <p className="mt-2 text-xs font-bold uppercase tracking-wide text-muted">
+                  {tx("正確答案", "Correct answer")}
+                </p>
+                <p className="mt-0.5 whitespace-pre-wrap text-ink">
+                  {answerRows[openIndex].expected || "—"}
+                </p>
+              </div>
+            ) : null}
           </div>
         ) : null}
 
